@@ -40,8 +40,9 @@ users.post("/Create",async(req,res)=>{
 })
 
 
-users.get("/Login",async(req,res)=>{
+users.post("/Login",async(req,res)=>{
     try{
+        
         const password=await userCollection.findOne({email:req.body.email},{projection:{_id:0,password:1}});
         
         if(password!=null){
