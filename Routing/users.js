@@ -64,8 +64,23 @@ users.post("/Login",async(req,res)=>{
         }
        
     }catch(e){
-            res.send(e);
+        res.status(500).send({message:"Internal Server Error"})
     }
+})
+
+users.post("/verifyToken",(req,res)=>{
+    try{
+        Jwt.verify(req.body.token,process.env.JWT_SECREAT_KEY,((err,result)=>{
+                if(err){
+                    res.status(500).send({message:"Internal Server Error",err})
+                }else{
+                    res.send(result)
+                }
+        }));
+    }
+    catch(e){
+        res.status(500).send({message:"Internal Server Error"})
+    }  
 })
 
 export default users;
