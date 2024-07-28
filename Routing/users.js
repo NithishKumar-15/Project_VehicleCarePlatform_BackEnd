@@ -44,12 +44,12 @@ users.post("/Login",async(req,res)=>{
     try{
         
         const password=await userCollection.findOne({email:req.body.email},{projection:{_id:0,password:1}});
-        
         if(password!=null){
-            bcrypt.compare(req.body.password,password.password,(err,result)=>{
+            bcrypt.compare(req.body.password,password.password,async(err,result)=>{
                 if(result){
                     const payload={
-                        email:req.body.email
+                        email:req.body.email,
+                        UserName:await userCollection.findOne({email:req.body.email},{projection:{_id:0,name:1}})
                     }
                     const token=Jwt.sign(payload,process.env.JWT_SECREAT_KEY,{
                         expiresIn:process.env.JWT_EXPIRE
@@ -70,7 +70,7 @@ users.post("/Login",async(req,res)=>{
 
 users.post("/verifyToken",(req,res)=>{
     try{
-        Jwt.verify(req.body.token,process.env.JWT_SECREAT_KEY,((err,result)=>{
+        Jwt.verify(req.body.token,process.env.JWT_SECREAT_KEY,(async(err,result)=>{
                 if(err){
                     res.status(500).send({message:"Internal Server Error",err})
                 }else{
