@@ -6,7 +6,6 @@ dotenv.config();
 
 const transport=nodemailer.createTransport({
     service:"gmail",
-    host:"smtp.gmail.com",
     auth:{
         user:"nithishkumarmurugesan2001@gmail.com",
         pass:process.env.MAIL_PASSWORD

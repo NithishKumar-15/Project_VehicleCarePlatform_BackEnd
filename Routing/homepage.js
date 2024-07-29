@@ -26,11 +26,14 @@ function getWeekNumber(date) {
 
 homePage.post("/AppointmentBook",async(req,res)=>{
     try{
+        const servicePrice=req.body.service.split('/');
         const data={
-            ...req.body
+            ...req.body,
+            service:servicePrice[0],
+            serviceAmount:servicePrice[1],
+            work:"workstarted"
         }
 
-        await useCollection.updateOne({name:req.body.customerName},{$push:{Appointment:data}});
         const date=req.body.appoinmentDate.split("/");
 
         const email=await useCollection.findOne({name:req.body.customerName},{projection:{_id:0,email:1}})
@@ -38,31 +41,36 @@ homePage.post("/AppointmentBook",async(req,res)=>{
          
         console.log(date);
        
-    const dateToSendMail=new Date(2024,7,28,19,30,0);
-
-        // const job=schedule.scheduleJob(`0 13 19 ${date[2]} 7 7`,()=>{
-        //     console.log("Mail")
-        //     transport.sendMail({
-        //         ...mailOption,
-        //         to:email.email
-        //     })
-        // })
-
-        const job=schedule.scheduleJob(`0 38 19 ${date[2]} ${date[1]} ${date[3]}`,()=>{
-            console.log("Mail")
+        const job=schedule.scheduleJob(`0 25 20 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
+            console.log("Job")
+            await useCollection.updateOne({name:req.body.customerName},{$set:{Appointment:data}})
+            
             transport.sendMail({
                 ...mailOption,
                 to:email.email
             })
-        })
 
-        // const job=schedule.scheduleJob(dateToSendMail,()=>{
-        //     console.log("Mail")
-        //     transport.sendMail({
-        //         ...mailOption,
-        //         to:email.email
-        //     })
-        // })
+            const job1=schedule.scheduleJob(`0 27 20 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
+                console.log("job1");
+                await useCollection.updateOne({name:req.body.customerName},{$set:{"Appointment.work":"workonprocess"}})
+
+                const job2=schedule.scheduleJob(`0 29 20 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
+                    console.log("job2");
+                    await useCollection.updateOne({name:req.body.customerName},{$set:{"Appointment.work":"fiftypercentofworkcompleted"}})
+
+                    const job3=schedule.scheduleJob(`0 32 20 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
+                        console.log("job3");
+                        await useCollection.updateOne({name:req.body.customerName},{$set:{"Appointment.work":"workgoingtocomplete"}})
+                        
+                        const job4=schedule.scheduleJob(`0 34 20 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
+                            console.log("job4");
+                            await useCollection.updateOne({name:req.body.customerName},{$set:{"Appointment.work":"workcompleted"}})
+                        })
+                    })
+                })
+            })
+            
+        })
 
         res.send({message:"Appoiment added"});
     }catch(e){

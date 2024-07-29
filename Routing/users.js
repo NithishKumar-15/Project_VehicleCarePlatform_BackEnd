@@ -22,7 +22,7 @@ users.post("/Create",async(req,res)=>{
                     const userData={
                         ...req.body,
                         password:hash,
-                        Appointment:[],
+                        Appointment:{},
                         PreviousHistory:[]
                         }
                         await userCollection.insertOne(userData);
