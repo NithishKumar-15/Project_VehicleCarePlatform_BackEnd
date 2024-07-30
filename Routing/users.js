@@ -44,6 +44,7 @@ users.post("/Login",async(req,res)=>{
     try{
         
         const password=await userCollection.findOne({email:req.body.email},{projection:{_id:0,password:1}});
+        console.log(req.url);
         if(password!=null){
             bcrypt.compare(req.body.password,password.password,async(err,result)=>{
                 if(result){

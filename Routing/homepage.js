@@ -2,27 +2,14 @@ import Express from "express";
 import { db } from "../DB/dbConnection.js";
 import schedule from "node-schedule"
 import { transport,mailOption } from "../MailUtils/mail.js";
+import Stripe from "stripe";
 
 const homePage=Express.Router();
 
+const stripe=new Stripe(process.env.STRIP_SECREATKEY);
+
 const useCollection=db.collection(process.env.DB_USERCOLLECTION);
 
-function getWeekNumber(date) {
-    // Copy date so don't modify the original
-    const currentDate = new Date(date.getTime());
-    
-    // Set to nearest Thursday: current date + 4 - current day number
-    // Make Sunday's day number 7
-    currentDate.setDate(currentDate.getDate() + 4 - (currentDate.getDay() || 7));
-    
-    // Get first day of the year
-    const yearStart = new Date(currentDate.getFullYear(), 0, 1);
-    
-    // Calculate full weeks to nearest Thursday
-    const weekNumber = Math.ceil((((currentDate - yearStart) / 86400000) + 1) / 7);
-    
-    return weekNumber;
-}
 
 homePage.post("/AppointmentBook",async(req,res)=>{
     try{
@@ -83,6 +70,39 @@ homePage.post("/GetUserAppointment",async(req,res)=>{
     try{
         const appoinment= await useCollection.find({name:req.body.user},{projection:{_id:0,Appointment:1}}).toArray();
         res.send(appoinment);
+    }catch(e){
+        res.status(500).send({message:"Internal Server error",e});
+    }
+})
+
+
+homePage.post("/payment",async(req,res)=>{
+
+    try{
+        const payment=req.body.payment;
+        const successUrl=req.body.user;
+        console.log(successUrl)
+        const session=await stripe.checkout.sessions.create({
+            line_items:[
+                {
+                    price_data:{
+                        currency:"usd",
+                        product_data:{
+                            name:req.body.service,
+                            description:"Payment for your vehicle service"
+                        },
+                        unit_amount:Number(req.body.payment)/60,
+                    },
+                    quantity:1
+                }
+            ],
+            mode:'payment',
+            success_url:'http://localhost:5173/PaymentSuccess/',
+            cancel_url:"http://localhost:5173/PaymentCancel"
+        })
+       
+        res.send(session);
+
     }catch(e){
         res.status(500).send({message:"Internal Server error",e});
     }
