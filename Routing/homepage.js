@@ -24,12 +24,9 @@ homePage.post("/AppointmentBook",async(req,res)=>{
         const date=req.body.appoinmentDate.split("/");
 
         const email=await useCollection.findOne({name:req.body.customerName},{projection:{_id:0,email:1}})
-        console.log(email);
-         
-        console.log(date);
-       
-        const job=schedule.scheduleJob(`0 25 20 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
-            console.log("Job")
+    
+        const job=schedule.scheduleJob(`0 1 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
+            
             await useCollection.updateOne({name:req.body.customerName},{$set:{Appointment:data}})
             
             transport.sendMail({
@@ -37,20 +34,20 @@ homePage.post("/AppointmentBook",async(req,res)=>{
                 to:email.email
             })
 
-            const job1=schedule.scheduleJob(`0 27 20 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
-                console.log("job1");
+            const job1=schedule.scheduleJob(`0 10 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
+                
                 await useCollection.updateOne({name:req.body.customerName},{$set:{"Appointment.work":"workonprocess"}})
 
-                const job2=schedule.scheduleJob(`0 29 20 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
-                    console.log("job2");
+                const job2=schedule.scheduleJob(`0 20 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
+                    
                     await useCollection.updateOne({name:req.body.customerName},{$set:{"Appointment.work":"fiftypercentofworkcompleted"}})
 
-                    const job3=schedule.scheduleJob(`0 32 20 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
-                        console.log("job3");
+                    const job3=schedule.scheduleJob(`0 30 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
+                        
                         await useCollection.updateOne({name:req.body.customerName},{$set:{"Appointment.work":"workgoingtocomplete"}})
                         
-                        const job4=schedule.scheduleJob(`0 34 20 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
-                            console.log("job4");
+                        const job4=schedule.scheduleJob(`0 40 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
+                            
                             await useCollection.updateOne({name:req.body.customerName},{$set:{"Appointment.work":"workcompleted"}})
                         })
                     })
@@ -79,9 +76,6 @@ homePage.post("/GetUserAppointment",async(req,res)=>{
 homePage.post("/payment",async(req,res)=>{
 
     try{
-        const payment=req.body.payment;
-        const successUrl=req.body.user;
-        console.log(successUrl)
         const session=await stripe.checkout.sessions.create({
             line_items:[
                 {
@@ -91,17 +85,17 @@ homePage.post("/payment",async(req,res)=>{
                             name:req.body.service,
                             description:"Payment for your vehicle service"
                         },
-                        unit_amount:Number(req.body.payment)/60,
+                        unit_amount:Number(req.body.payment),
                     },
                     quantity:1
                 }
             ],
             mode:'payment',
-            success_url:'http://localhost:5173/PaymentSuccess/',
+            success_url:"http://localhost:5173/PaymentSuccess",
             cancel_url:"http://localhost:5173/PaymentCancel"
         })
        
-        res.send(session);
+        res.send({message:"Payment success",session});
 
     }catch(e){
         res.status(500).send({message:"Internal Server error",e});

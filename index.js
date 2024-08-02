@@ -20,10 +20,8 @@ server.use(cors());
 
 const homeMiddleWare=(req,res,next)=>{
     try{
-        //console.log(req.headers['token'])
         Jwt.verify(req.headers['token'],process.env.JWT_SECREAT_KEY,async(err,result)=>{
             if(err){
-                console.log(err);
                 res.send({message:"unAuthorized"})
             }else{
                 next();

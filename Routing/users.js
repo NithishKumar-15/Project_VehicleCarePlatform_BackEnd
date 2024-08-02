@@ -44,7 +44,6 @@ users.post("/Login",async(req,res)=>{
     try{
         
         const password=await userCollection.findOne({email:req.body.email},{projection:{_id:0,password:1}});
-        console.log(req.url);
         if(password!=null){
             bcrypt.compare(req.body.password,password.password,async(err,result)=>{
                 if(result){
@@ -82,6 +81,27 @@ users.post("/verifyToken",(req,res)=>{
     catch(e){
         res.status(500).send({message:"Internal Server Error"})
     }  
+})
+
+users.put("/addPeviousHistory",async(req,res)=>{
+    try{
+        const data=await userCollection.findOne({email:req.body.email},{projection:{_id:0,Appointment:1}});
+        await userCollection.updateOne({email:req.body.email},{$push:{PreviousHistory:data.Appointment}});
+        await userCollection.updateOne({email:req.body.email},{$set:{Appointment:{}}})
+        res.send({message:"Data update to previous history"})
+    }catch(e){
+        res.status(500).send({message:"Internal Server Error"})
+    }
+})
+
+users.get("/PreviousHistory",async(req,res)=>{
+    try{
+        const email=req.headers["email"];
+        const data=await userCollection.findOne({email:email},{projection:{_id:0,PreviousHistory:1}});
+        res.send(data.PreviousHistory)
+    }catch(e){
+        res.status(500).send({message:"Internal Server Error"})
+    }
 })
 
 export default users;
