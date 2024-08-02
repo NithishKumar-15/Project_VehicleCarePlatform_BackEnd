@@ -26,7 +26,7 @@ homePage.post("/AppointmentBook",async(req,res)=>{
 
         const email=await userCollection.findOne({name:req.body.customerName},{projection:{_id:0,email:1}})
     
-        const job=schedule.scheduleJob(`0 17 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
+        const job=schedule.scheduleJob(`0 42 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
             console.log('Your email')
             await userCollection.updateOne({name:req.body.customerName},{$set:{Appointment:data}})
             
@@ -55,7 +55,7 @@ homePage.post("/AppointmentBook",async(req,res)=>{
                 })
             })
             
-        })
+        },{timezone:'Asia/Calcutta'})
 
         res.send({message:"Appoiment added"});
     }catch(e){
