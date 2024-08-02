@@ -8,9 +8,10 @@ const homePage=Express.Router();
 
 const stripe=new Stripe(process.env.STRIP_SECREATKEY);
 
-const useCollection=db.collection(process.env.DB_USERCOLLECTION);
+//User db collection
+const userCollection=db.collection(process.env.DB_USERCOLLECTION);
 
-
+//API a to book and AppointmentBook
 homePage.post("/AppointmentBook",async(req,res)=>{
     try{
         const servicePrice=req.body.service.split('/');
@@ -23,32 +24,32 @@ homePage.post("/AppointmentBook",async(req,res)=>{
 
         const date=req.body.appoinmentDate.split("/");
 
-        const email=await useCollection.findOne({name:req.body.customerName},{projection:{_id:0,email:1}})
+        const email=await userCollection.findOne({name:req.body.customerName},{projection:{_id:0,email:1}})
     
-        const job=schedule.scheduleJob(`0 1 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
+        const job=schedule.scheduleJob(`0 10 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
             
-            await useCollection.updateOne({name:req.body.customerName},{$set:{Appointment:data}})
+            await userCollection.updateOne({name:req.body.customerName},{$set:{Appointment:data}})
             
             transport.sendMail({
                 ...mailOption,
                 to:email.email
             })
 
-            const job1=schedule.scheduleJob(`0 10 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
+            const job1=schedule.scheduleJob(`0 15 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
                 
-                await useCollection.updateOne({name:req.body.customerName},{$set:{"Appointment.work":"workonprocess"}})
+                await userCollection.updateOne({name:req.body.customerName},{$set:{"Appointment.work":"workonprocess"}})
 
                 const job2=schedule.scheduleJob(`0 20 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
                     
-                    await useCollection.updateOne({name:req.body.customerName},{$set:{"Appointment.work":"fiftypercentofworkcompleted"}})
+                    await userCollection.updateOne({name:req.body.customerName},{$set:{"Appointment.work":"fiftypercentofworkcompleted"}})
 
-                    const job3=schedule.scheduleJob(`0 30 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
+                    const job3=schedule.scheduleJob(`0 25 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
                         
-                        await useCollection.updateOne({name:req.body.customerName},{$set:{"Appointment.work":"workgoingtocomplete"}})
+                        await userCollection.updateOne({name:req.body.customerName},{$set:{"Appointment.work":"workgoingtocomplete"}})
                         
-                        const job4=schedule.scheduleJob(`0 40 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
+                        const job4=schedule.scheduleJob(`0 30 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
                             
-                            await useCollection.updateOne({name:req.body.customerName},{$set:{"Appointment.work":"workcompleted"}})
+                            await userCollection.updateOne({name:req.body.customerName},{$set:{"Appointment.work":"workcompleted"}})
                         })
                     })
                 })
@@ -62,17 +63,17 @@ homePage.post("/AppointmentBook",async(req,res)=>{
     }
 })
 
-
+//API to get the user AppointmentBook
 homePage.post("/GetUserAppointment",async(req,res)=>{
     try{
-        const appoinment= await useCollection.find({name:req.body.user},{projection:{_id:0,Appointment:1}}).toArray();
+        const appoinment= await userCollection.find({name:req.body.user},{projection:{_id:0,Appointment:1}}).toArray();
         res.send(appoinment);
     }catch(e){
         res.status(500).send({message:"Internal Server error",e});
     }
 })
 
-
+// API for stripe payment gateway 
 homePage.post("/payment",async(req,res)=>{
 
     try{

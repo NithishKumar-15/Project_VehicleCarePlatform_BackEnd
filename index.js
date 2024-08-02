@@ -16,8 +16,10 @@ dotenv.config();
 
 server.use(Express.json());
 
+//MiddleWare for cros orgin
 server.use(cors());
 
+//Middle ware for home page when ever the api hit from the home page this middleware verify the token and send to the regarding api
 const homeMiddleWare=(req,res,next)=>{
     try{
         Jwt.verify(req.headers['token'],process.env.JWT_SECREAT_KEY,async(err,result)=>{
@@ -32,10 +34,12 @@ const homeMiddleWare=(req,res,next)=>{
     }
 }
 
+//Port Number
 const port=5000
 
 await dbconnection();
 
+//Routers
 server.use("/Users",users);
 server.use("/FeedBack",feedBack);
 server.use("/ServiceDetails",serviceDetails);

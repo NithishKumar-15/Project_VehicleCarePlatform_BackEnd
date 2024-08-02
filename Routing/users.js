@@ -6,10 +6,10 @@ import Jwt from "jsonwebtoken";
 
 const users=Express.Router();
 
-
-
+//Users DB Collection
 const userCollection =db.collection(process.env.DB_USERCOLLECTION);
 
+//API to create a new user
 users.post("/Create",async(req,res)=>{
     
     try{
@@ -40,6 +40,7 @@ users.post("/Create",async(req,res)=>{
 })
 
 
+//APi to login the user
 users.post("/Login",async(req,res)=>{
     try{
         
@@ -68,6 +69,7 @@ users.post("/Login",async(req,res)=>{
     }
 })
 
+//API to verify the token in the token when the user login to the home page
 users.post("/verifyToken",(req,res)=>{
     try{
         Jwt.verify(req.body.token,process.env.JWT_SECREAT_KEY,(async(err,result)=>{
@@ -83,6 +85,7 @@ users.post("/verifyToken",(req,res)=>{
     }  
 })
 
+//API to add the appoinment details to the previous history
 users.put("/addPeviousHistory",async(req,res)=>{
     try{
         const data=await userCollection.findOne({email:req.body.email},{projection:{_id:0,Appointment:1}});
@@ -94,6 +97,7 @@ users.put("/addPeviousHistory",async(req,res)=>{
     }
 })
 
+//API to get the previous history record of a specific user
 users.get("/PreviousHistory",async(req,res)=>{
     try{
         const email=req.headers["email"];

@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+//Mail transpoter
 const transport=nodemailer.createTransport({
     service:"gmail",
     auth:{
@@ -12,6 +13,7 @@ const transport=nodemailer.createTransport({
     },
 });
 
+//Mail content
 const mailOption={
     from:"nithishkumarmurugesan2001@gmail.com",
     to:[],
