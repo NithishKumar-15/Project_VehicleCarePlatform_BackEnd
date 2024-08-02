@@ -26,8 +26,8 @@ homePage.post("/AppointmentBook",async(req,res)=>{
 
         const email=await userCollection.findOne({name:req.body.customerName},{projection:{_id:0,email:1}})
     
-        const job=schedule.scheduleJob(`0 10 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
-            
+        const job=schedule.scheduleJob(`0 17 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
+            console.log('Your email')
             await userCollection.updateOne({name:req.body.customerName},{$set:{Appointment:data}})
             
             transport.sendMail({
@@ -35,19 +35,19 @@ homePage.post("/AppointmentBook",async(req,res)=>{
                 to:email.email
             })
 
-            const job1=schedule.scheduleJob(`0 15 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
+            const job1=schedule.scheduleJob(`0 19 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
                 
                 await userCollection.updateOne({name:req.body.customerName},{$set:{"Appointment.work":"workonprocess"}})
 
-                const job2=schedule.scheduleJob(`0 20 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
+                const job2=schedule.scheduleJob(`0 21 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
                     
                     await userCollection.updateOne({name:req.body.customerName},{$set:{"Appointment.work":"fiftypercentofworkcompleted"}})
 
-                    const job3=schedule.scheduleJob(`0 25 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
+                    const job3=schedule.scheduleJob(`0 24 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
                         
                         await userCollection.updateOne({name:req.body.customerName},{$set:{"Appointment.work":"workgoingtocomplete"}})
                         
-                        const job4=schedule.scheduleJob(`0 30 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
+                        const job4=schedule.scheduleJob(`0 25 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
                             
                             await userCollection.updateOne({name:req.body.customerName},{$set:{"Appointment.work":"workcompleted"}})
                         })
