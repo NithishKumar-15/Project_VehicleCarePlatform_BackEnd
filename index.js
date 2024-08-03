@@ -46,5 +46,5 @@ server.use("/ServiceDetails",serviceDetails);
 server.use('/HomePage',homeMiddleWare,homePage);
 
 server.listen(port,()=>{
-    console.log("Server listening in the port: "+port)
+    console.log("Server listening on the port: "+port)
 })

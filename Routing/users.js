@@ -22,7 +22,7 @@ users.post("/Create",async(req,res)=>{
                     const userData={
                         ...req.body,
                         password:hash,
-                        Appointment:{},
+                        Appointment:[],
                         PreviousHistory:[]
                         }
                         await userCollection.insertOne(userData);
@@ -89,8 +89,23 @@ users.post("/verifyToken",(req,res)=>{
 users.put("/addPeviousHistory",async(req,res)=>{
     try{
         const data=await userCollection.findOne({email:req.body.email},{projection:{_id:0,Appointment:1}});
-        await userCollection.updateOne({email:req.body.email},{$push:{PreviousHistory:data.Appointment}});
-        await userCollection.updateOne({email:req.body.email},{$set:{Appointment:{}}})
+
+        const pushPreviousData=data.Appointment.filter((val)=>{
+            if(val.id==req.body.id){
+                return val
+            }
+        })
+        await userCollection.updateOne({email:req.body.email},{$push:{PreviousHistory:pushPreviousData[0]}});
+
+       const filterData=data.Appointment.filter((val)=>{
+        if(val.id!=req.body.id){
+            return val
+        }
+       })
+       await userCollection.updateOne({email:req.body.email},{$set:{Appointment:filterData}});
+
+        // await userCollection.updateOne({email:req.body.email},{$push:{PreviousHistory:data.Appointment}});
+        // await userCollection.updateOne({email:req.body.email},{$set:{Appointment:{}}})
         res.send({message:"Data update to previous history"})
     }catch(e){
         res.status(500).send({message:"Internal Server Error"})
