@@ -25,82 +25,82 @@ homePage.post("/AppointmentBook", async (req, res) => {
 
         //const email=await userCollection.findOne({email:req.body.email},{projection:{_id:0,email:1}})
 
-        await userCollection.updateOne({ email: req.body.email }, { $push: { Appointment: data } })
+        // await userCollection.updateOne({ email: req.body.email }, { $push: { Appointment: data } })
 
-        transport.sendMail({
-            ...mailOption,
-            to: req.body.email
-        })
+        // transport.sendMail({
+        //     ...mailOption,
+        //     to: req.body.email
+        // })
 
         //**This the code for task schedule for a prticular date this is the code I have mentioned in the readme.md file **/    
-        // const date=req.body.appoinmentDate.split("/");    
-        // const job=schedule.scheduleJob(`0 38 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
+        const date=req.body.appoinmentDate.split("/");    
+        const job=schedule.scheduleJob(`0 38 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
 
-        //     await userCollection.updateOne({email:req.body.email},{$push:{Appointment:data}})
+            await userCollection.updateOne({email:req.body.email},{$push:{Appointment:data}})
 
-        //     transport.sendMail({
-        //         ...mailOption,
-        //         to:req.body.email
-        //     })
+            transport.sendMail({
+                ...mailOption,
+                to:req.body.email
+            })
 
-        //     const job1=schedule.scheduleJob(`0 40 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
+            const job1=schedule.scheduleJob(`0 40 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
 
-        //         //await userCollection.updateOne({name:req.body.customerName},{$set:{"Appointment.work":"workonprocess"}})
+                //await userCollection.updateOne({name:req.body.customerName},{$set:{"Appointment.work":"workonprocess"}})
 
-        //         const updateData=await userCollection.findOne({email:req.body.email},{projection:{_id:0,Appointment:1}});
-        //         const filterData=updateData.Appointment.map((val)=>{
-        //             if(val.id===data.id){
-        //                 return {...val,work:"workonprocess"}
-        //             }else{
-        //                 return val;
-        //             }
-        //         })
-        //         await userCollection.updateOne({email:req.body.email},{$set:{Appointment:filterData}})
+                const updateData=await userCollection.findOne({email:req.body.email},{projection:{_id:0,Appointment:1}});
+                const filterData=updateData.Appointment.map((val)=>{
+                    if(val.id===data.id){
+                        return {...val,work:"workonprocess"}
+                    }else{
+                        return val;
+                    }
+                })
+                await userCollection.updateOne({email:req.body.email},{$set:{Appointment:filterData}})
 
-        //         const job2=schedule.scheduleJob(`0 42 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
+                const job2=schedule.scheduleJob(`0 42 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
 
-        //             //await userCollection.updateOne({name:req.body.customerName},{$set:{"Appointment.work":"fiftypercentofworkcompleted"}})
-        //             const updateData1=await userCollection.findOne({email:req.body.email},{projection:{_id:0,Appointment:1}});
-        //              const filterData1=updateData1.Appointment.map((val)=>{
-        //                 if(val.id===data.id){
-        //                 return {...val,work:"fiftypercentofworkcompleted"}
-        //              }else{
-        //                 return val;
-        //              }
-        //              })
-        //             await userCollection.updateOne({email:req.body.email},{$set:{Appointment:filterData1}})
+                    //await userCollection.updateOne({name:req.body.customerName},{$set:{"Appointment.work":"fiftypercentofworkcompleted"}})
+                    const updateData1=await userCollection.findOne({email:req.body.email},{projection:{_id:0,Appointment:1}});
+                     const filterData1=updateData1.Appointment.map((val)=>{
+                        if(val.id===data.id){
+                        return {...val,work:"fiftypercentofworkcompleted"}
+                     }else{
+                        return val;
+                     }
+                     })
+                    await userCollection.updateOne({email:req.body.email},{$set:{Appointment:filterData1}})
 
-        //             const job3=schedule.scheduleJob(`0 44 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
+                    const job3=schedule.scheduleJob(`0 44 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
 
-        //                 //await userCollection.updateOne({name:req.body.customerName},{$set:{"Appointment.work":"workgoingtocomplete"}})
-        //                     const updateData2=await userCollection.findOne({email:req.body.email},{projection:{_id:0,Appointment:1}});
-        //                 const filterData2=updateData2.Appointment.map((val)=>{
-        //                     if(val.id===data.id){
-        //                     return {...val,work:"workgoingtocomplete"}
-        //                 }else{
-        //                     return val;
-        //                 }
-        //                 })
-        //                 await userCollection.updateOne({email:req.body.email},{$set:{Appointment:filterData2}})
+                        //await userCollection.updateOne({name:req.body.customerName},{$set:{"Appointment.work":"workgoingtocomplete"}})
+                            const updateData2=await userCollection.findOne({email:req.body.email},{projection:{_id:0,Appointment:1}});
+                        const filterData2=updateData2.Appointment.map((val)=>{
+                            if(val.id===data.id){
+                            return {...val,work:"workgoingtocomplete"}
+                        }else{
+                            return val;
+                        }
+                        })
+                        await userCollection.updateOne({email:req.body.email},{$set:{Appointment:filterData2}})
 
-        //                 const job4=schedule.scheduleJob(`0 46 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
+                        const job4=schedule.scheduleJob(`0 46 12 ${date[2]} ${date[1]} ${date[3]}`,async()=>{
 
-        //                     //await userCollection.updateOne({name:req.body.customerName},{$set:{"Appointment.work":"workcompleted"}})
-        //                         const updateData3=await userCollection.findOne({email:req.body.email},{projection:{_id:0,Appointment:1}});
-        //                         const filterData3=updateData3.Appointment.map((val)=>{
-        //                         if(val.id===data.id){
-        //                          return {...val,work:"workcompleted"}
-        //                           }else{
-        //                             return val;
-        //                              }
-        //                             })
-        //                          await userCollection.updateOne({email:req.body.email},{$set:{Appointment:filterData3}})
-        //                 })
-        //             })
-        //         })
-        //     })
+                            //await userCollection.updateOne({name:req.body.customerName},{$set:{"Appointment.work":"workcompleted"}})
+                                const updateData3=await userCollection.findOne({email:req.body.email},{projection:{_id:0,Appointment:1}});
+                                const filterData3=updateData3.Appointment.map((val)=>{
+                                if(val.id===data.id){
+                                 return {...val,work:"workcompleted"}
+                                  }else{
+                                    return val;
+                                     }
+                                    })
+                                 await userCollection.updateOne({email:req.body.email},{$set:{Appointment:filterData3}})
+                        })
+                    })
+                })
+            })
 
-        // })
+        })
 
         res.send({ message: "Appoiment added" });
     } catch (e) {
